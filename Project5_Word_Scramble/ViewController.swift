@@ -29,6 +29,7 @@ class ViewController: UITableViewController {
 
         startGame()
     }
+    
 
         @objc func startGame() {
         usedWords = []
@@ -37,9 +38,11 @@ class ViewController: UITableViewController {
         tableView.reloadData()
     }
 
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return usedWords.count
     }
+
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath)
@@ -47,9 +50,14 @@ class ViewController: UITableViewController {
         return cell
     }
 
+
     @objc func promptForAnswer() {
         let ac = UIAlertController(title: "Enter answer", message: nil, preferredStyle: .alert)
-        ac.addTextField()
+        //ac.addTextField()
+        ac.addTextField { textField in
+            textField.autocapitalizationType = .none // Disable autocapitalization
+            textField.delegate = self // Set the delegate to handle text input
+        }
 
         let submitAction = UIAlertAction(title: "Submit", style: .default) {
             [weak self, weak ac] _ in
@@ -61,9 +69,9 @@ class ViewController: UITableViewController {
         present(ac, animated: true)
     }
 
+
     func submit(_ answer: String) {
         let lowerAnswer = answer.lowercased()
-
         let errorTitle: String
         let errorMessage: String
 
@@ -79,7 +87,7 @@ class ViewController: UITableViewController {
             return showErrorMessage(title: errorTitle, message: errorMessage)
         }
 
-        guard isReal(word: lowerAnswer) else {
+        guard spellingCheckEnglish(word: lowerAnswer) else {
             errorTitle = "Word is not recognized"
             errorMessage = "You can't just make them up, you know!"
             return showErrorMessage(title: errorTitle, message: errorMessage)
@@ -96,14 +104,6 @@ class ViewController: UITableViewController {
             errorMessage = "Try another word"
             return showErrorMessage(title: errorTitle, message: errorMessage)
         }
-
-//        guard !isUppercased(word: lowerAnswer) else {
-//            errorTitle = "Word should not have uppercased laters"
-//            errorMessage = "Try again with lowercased laters"
-//            return showErrorMessage(title: errorTitle, message: errorMessage)
-//        }
-
-        //TODO: all words should be accepted and sing in row as lover cased
 
         usedWords.insert(answer, at: 0)
 
@@ -132,30 +132,42 @@ class ViewController: UITableViewController {
         return true
     }
 
+
     func isOriginal(word: String) -> Bool {
         return !usedWords.contains(word)
     }
 
-    func isReal(word: String) -> Bool {
+
+    func spellingCheckEnglish(word: String) -> Bool {
         let checker = UITextChecker()
         let range = NSRange(location: 0, length: word.utf16.count)
         let misspelledRange = checker.rangeOfMisspelledWord(in: word, range: range, startingAt: 0, wrap: false, language: "en")
         return misspelledRange.location == NSNotFound
     }
 
+
     func isEmpty(word: String) -> Bool {
         guard word.isEmpty else { return false }
         return true
     }
+
 
     func isStartWord(word: String) -> Bool {
         guard word == title else { return false }
         return true
     }
 
-//    func isUppercased(word: String) -> Bool {
-//        guard word.contains(word.uppercased()) else { return false }
-//        return true
-//    }
+
+}
+
+
+extension ViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        // Convert any uppercase letters to lowercase and update the text field's text
+        textField.text = (textField.text! as NSString).replacingCharacters(in: range, with: string.lowercased())
+
+        // Always return false to prevent the original text from being replaced
+        return false
+    }
 }
 
