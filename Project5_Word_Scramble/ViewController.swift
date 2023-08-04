@@ -9,13 +9,14 @@ import UIKit
 
 class ViewController: UITableViewController {
     var allWords = [String]()
-    var usedWords = [String]()
+    var currentWord = [CurrentWord]()
+
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(promptForAnswer))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(startGame))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(reStartGame))
 
         if let startWordsURL = Bundle.main.url(forResource: "start", withExtension: "txt") {
             if let startWords = try? String(contentsOf: startWordsURL) {
@@ -27,33 +28,69 @@ class ViewController: UITableViewController {
             allWords = ["silkworm"]
         }
 
-        startGame()
+//        if currentWord.isEmpty {
+//            startGame()
+//        } else {
+//            loadCurrentWord()
+//        }
+
+        loadCurrentWord()
     }
     
 
-        @objc func startGame() {
-        usedWords = []
-        title = allWords.randomElement()
-        usedWords.removeAll(keepingCapacity: true)
+//    func startGame() {
+//        let newWord = CurrentWord(word: "", usedWords: [])
+//        title = allWords.randomElement()
+//        newWord.word = title ?? "silkworm"
+//        currentWord.append(newWord)
+//        saveCurrentWord()
+//        tableView.reloadData()
+//    }
+
+
+    @objc func reStartGame() {
+        clearCurrentWord()
+
+        let newWord = CurrentWord(word: allWords.randomElement() ?? "silkworm", usedWords: [])
+        title = newWord.word
+        currentWord.append(newWord)
+        saveCurrentWord()
         tableView.reloadData()
     }
 
 
+    func clearCurrentWord() {
+        currentWord.removeAll(keepingCapacity: true)
+    }
+
+
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return usedWords.count
+        if section < currentWord.count {
+            return currentWord[section].usedWords.count
+        } else {
+            return 0
+        }
     }
 
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Word", for: indexPath)
-        cell.textLabel?.text = usedWords[indexPath.row]
+
+        // Check if the section index is within the bounds of the currentWord array
+        if indexPath.section < currentWord.count {
+            let currentWordObject = currentWord[indexPath.section]
+
+            // Check if the row index is within the bounds of the usedWords array of the currentWordObject
+            if indexPath.row < currentWordObject.usedWords.count {
+                cell.textLabel?.text = currentWordObject.usedWords[indexPath.row]
+            }
+        }
         return cell
     }
 
 
     @objc func promptForAnswer() {
         let ac = UIAlertController(title: "Enter answer", message: nil, preferredStyle: .alert)
-        //ac.addTextField()
         ac.addTextField { textField in
             textField.autocapitalizationType = .none // Disable autocapitalization
             textField.delegate = self // Set the delegate to handle text input
@@ -105,7 +142,11 @@ class ViewController: UITableViewController {
             return showErrorMessage(title: errorTitle, message: errorMessage)
         }
 
-        usedWords.insert(answer, at: 0)
+        if let currentWordObject = currentWord.first {
+            currentWordObject.usedWords.insert(answer, at: 0)
+            currentWord[0] = currentWordObject // Update the currentWord array with the modified currentWordObject
+        }
+        saveCurrentWord()
 
         let indexPath = IndexPath(row: 0, section: 0)
         tableView.insertRows(at: [indexPath], with: .automatic)
@@ -134,7 +175,10 @@ class ViewController: UITableViewController {
 
 
     func isOriginal(word: String) -> Bool {
-        return !usedWords.contains(word)
+        if let currentWordObject = currentWord.first {
+            return !currentWordObject.usedWords.contains(word)
+        }
+        return true
     }
 
 
@@ -168,6 +212,39 @@ extension ViewController: UITextFieldDelegate {
 
         // Always return false to prevent the original text from being replaced
         return false
+    }
+
+
+    func loadCurrentWord() {
+        let defaults = UserDefaults.standard
+
+        if let savedCurrentWord = defaults.object(forKey: "currentWord") as? Data {
+            let jsonDecoder = JSONDecoder()
+
+            do {
+                currentWord = try jsonDecoder.decode([CurrentWord].self, from: savedCurrentWord)
+                if let firstWord = currentWord.first {
+                    title = firstWord.word
+                }
+            } catch {
+                print("Failed to load current word")
+            }
+        }
+    }
+
+
+    func saveCurrentWord() {
+        let jsonEncoder = JSONEncoder()
+
+        if let saveData = try? jsonEncoder.encode(currentWord) {
+            let defaults = UserDefaults.standard
+            defaults.set(saveData, forKey: "currentWord")
+            if let firstWord = currentWord.first {
+                title = firstWord.word
+            }
+        } else {
+            print("Failed to save current word.")
+        }
     }
 }
 

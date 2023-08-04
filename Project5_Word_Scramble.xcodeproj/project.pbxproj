@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FB34653B2A7C07560001F817 /* CurrentWord.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB34653A2A7C07560001F817 /* CurrentWord.swift */; };
 		FB7234182A2DEF9D00764DCF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7234172A2DEF9D00764DCF /* AppDelegate.swift */; };
 		FB72341A2A2DEF9D00764DCF /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB7234192A2DEF9D00764DCF /* SceneDelegate.swift */; };
 		FB72341C2A2DEF9D00764DCF /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB72341B2A2DEF9D00764DCF /* ViewController.swift */; };
@@ -17,6 +18,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		FB34653A2A7C07560001F817 /* CurrentWord.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentWord.swift; sourceTree = "<group>"; };
 		FB7234142A2DEF9D00764DCF /* Project5_Word_Scramble.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Project5_Word_Scramble.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FB7234172A2DEF9D00764DCF /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FB7234192A2DEF9D00764DCF /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -61,6 +63,7 @@
 				FB7234172A2DEF9D00764DCF /* AppDelegate.swift */,
 				FB7234192A2DEF9D00764DCF /* SceneDelegate.swift */,
 				FB72341B2A2DEF9D00764DCF /* ViewController.swift */,
+				FB34653A2A7C07560001F817 /* CurrentWord.swift */,
 				FB89CB262A307BAE000E74D4 /* start.txt */,
 				FB72341D2A2DEF9D00764DCF /* Main.storyboard */,
 				FB7234202A2DEFA000764DCF /* Assets.xcassets */,
@@ -145,6 +148,7 @@
 				FB72341C2A2DEF9D00764DCF /* ViewController.swift in Sources */,
 				FB7234182A2DEF9D00764DCF /* AppDelegate.swift in Sources */,
 				FB72341A2A2DEF9D00764DCF /* SceneDelegate.swift in Sources */,
+				FB34653B2A7C07560001F817 /* CurrentWord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
